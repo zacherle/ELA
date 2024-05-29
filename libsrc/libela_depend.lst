@@ -1,0 +1,16 @@
+arrivals.o : arrivals.f90 stations.o hypfile.o 
+calc_covar.o : calc_covar.f90 const_raddeg.o layers.o 
+c_f_elalib.o : c_f_elalib.f90 arrivals.o stations.o hypfile.o layers.o output_list.o 
+const_raddeg.o : const_raddeg.f90 
+fw_tdx.o : fw_tdx.f90 gather.o 
+gather.o : gather.f90 arrivals.o twopoint.o 
+hypfile.o : hypfile.f90 
+layers.o : layers.f90 
+magni.o : magni.f90 arrivals.o 
+output_list.o : output_list.f90 gather.o hypfile.o arrivals.o version.o calc_covar.o const_raddeg.o layers.o 
+rt1Dlayers.o : rt1Dlayers.f90 
+stations.o : stations.f90 
+version.o : version.f90 
+xy2fl.o : xy2fl.for 
+gap.o : gap.c
+twopoint.o : twopoint.f90  rt1Dlayers.o const_raddeg.o layers.o

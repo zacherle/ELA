@@ -1,0 +1,3 @@
+loc_hypo.o : loc_hypo.f90 
+lmder2.o : lmder2.for 
+ela_main.o : ela_main.cpp ../include/c_f_elalib.h 
