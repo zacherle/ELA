@@ -1,0 +1,15 @@
+2024-06-13 v0.02
+For C++ F90 interoperability add:
+c_f_elalib.f90: setpar_model()
+Use static variables:
+c_f_elalib.f90: setpar_name_o
+arrivals.f90: arrs
+hypfile.f90: hyp
+layers.f90: model_error, reading_error, name_model
+output_list.f90: name_output_hy3
+
+2024-05-29 v.0.01
+Initial commit
+
+2024-01-30
+init repo

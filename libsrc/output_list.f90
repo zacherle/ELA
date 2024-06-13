@@ -5,18 +5,21 @@ use, intrinsic :: iso_fortran_env, only : real64
 
 implicit none
 
+character(LEN=255),save    :: name_output_hy3 = ' '
+
 contains
 
 subroutine write_hy3(lu, hypo, startpoint, marr, arrs, hyp, modfn, co, info)
-
-use layers,             only: model_error, reading_error
-use const_raddeg,       only: RAD2DEG, DEG2RAD
-use calc_covar,         only: get_errellipse
 use version,            only: pversion
+use layers,             only: model_error, reading_error, name_model
+
 use arrivals,           only: cFileArr, cRecordArr
 use hypfile,            only: cFileHyp, cRecordHyp
-!use datetime_module     only: datetime
+
+use const_raddeg,       only: RAD2DEG, DEG2RAD
+use calc_covar,         only: get_errellipse
 use gather_module,      only: collect_obs_simul
+!use datetime_module     only: datetime
 
 implicit none
 
@@ -90,7 +93,8 @@ real    ::  smag, smag2
 ! --------------------------------------------------------------------
 
    write (lu,'("program       :ELA, ",a)') pversion
-   write (lu,'("model         :",a)') modfn(1:lnblnk(modfn))       ! model name
+   !write (lu,'("model         :",a)') modfn(1:lnblnk(modfn))       ! model name
+   write (lu,'("model         :",a)') trim(name_model)
    write (lu,'("model error   :",f5.3," s")') model_error
    write (lu,'("reading error :",f5.3," s")') reading_error
 

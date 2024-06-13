@@ -43,6 +43,7 @@ procedure :: load  => filehyp_load
 procedure :: dump  => filehyp_dump
 end type cFileHyp
 
+type(cFileHyp),public     :: hyp
 save
 
 contains

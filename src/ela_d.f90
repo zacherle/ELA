@@ -2,11 +2,11 @@
 
 subroutine ela_d()
 
-use calc_covar,         only: cov_matrix1
-use arrivals,           only: parrs
-use fw_tdx, only: get_res_w, get_G_w
-use c_f_elalib,         only: arrs, hyp,c_f_str
-use output_list
+use calc_covar,   only: cov_matrix1
+use arrivals,     only: parrs
+use hypfile,      only: hyp
+use fw_tdx,       only: get_res_w, get_G_w
+use output_list,  only: name_output_hy3, write_hy3
 
 use, intrinsic :: iso_fortran_env, only : real64
 
@@ -46,7 +46,6 @@ integer                               :: info
 real(real64), dimension(4) :: hypo8
 real(real64), dimension(4,4) :: covM
 
-character(LEN=255) :: name_s=' '
 integer :: lu
 integer :: ios
 character (256) :: iom
@@ -158,20 +157,17 @@ do i=1,4
 write (*,'(4(f16.6," "))') covM(i,:)
 end do
 
-
-!   call C_F_str(hy3name, name_s, 255)
-!   open (file=name_s, newunit=lu, iostat=ios, iomsg=iom, status='UNKNOWN')
-   open (file='test.hy3', newunit=lu, iostat=ios, iomsg=iom, status='UNKNOWN')
+if(len(trim(name_output_hy3)) > 3) then
+   open (file=trim(name_output_hy3), newunit=lu, iostat=ios, iomsg=iom, status='UNKNOWN')
    if (ios/=0) then
        write(*,*) 'iostat = ', ios
        write(*,*) 'iomsg: '//trim(iom)
        stop
    end if
-   !call write_hy3(lu,hypo,startpt,marr,arrs,hyp,modfn,covM,info)
-   call write_hy3(lu,hypo,startpt,marr,arrs,hyp,'model',covM,info)
+   call write_hy3(lu,hypo,startpt,marr,parrs,hyp,'model',covM,info)
 
    close (UNIT = lu,status='KEEP')
-
+end if
 
 end subroutine ela_d
 

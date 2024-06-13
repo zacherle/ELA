@@ -1,7 +1,5 @@
 module c_f_elalib
 use :: iso_c_binding
-use :: HypFile
-use :: Arrivals
 
 implicit none
 
@@ -9,8 +7,8 @@ public filehyp_read
 public filesta_read
 public filemod_read
 
-type(cFileHyp),save     :: hyp
-type(cFileArr),target,save     :: arrs
+!type(cFileHyp),save     :: hyp
+!type(cFileArr),target,save     :: arrs
 
 public c_f_str
 contains
@@ -32,6 +30,8 @@ end subroutine C_F_str
 
 
 function filehyp_read(hypname) result(rmsg) bind(c,name='filehyp_read')
+use :: HypFile,  only: cFileHyp, hyp
+use :: Arrivals, only: cFileArr, parrs
    type(C_PTR),value,intent(in) :: hypname
    integer(c_int) :: rmsg
 
@@ -39,8 +39,8 @@ function filehyp_read(hypname) result(rmsg) bind(c,name='filehyp_read')
 
    call C_F_str(hypname, name_s, 255)
    rmsg=hyp%load(name_s)
-   call arrs%fill(hyp)
-   parrs=>arrs
+   call parrs%fill(hyp)
+   !parrs=>arrs
 
 end function filehyp_read
 
@@ -111,44 +111,23 @@ use :: layers
 
 end function filemod_read
 
-function filehy3_write(hy3name) result(rmsg) bind(c,name='filehy3_write')
-use output_list,        only: write_hy3
+subroutine setpar_name_o(hy3name) bind(c,name='setpar_name_o')
+use output_list,        only: name_output_hy3
    type(C_PTR), value,intent(in) :: hy3name
-   integer(c_int) :: rmsg     
 
-   character(LEN=255) :: name_s=' '
-   integer :: lu
-   integer :: ios
-   character (256) :: iom
+   call C_F_str(hy3name, name_output_hy3, 255)
 
-   rmsg=1
-   call C_F_str(hy3name, name_s, 255)
-   open (file=name_s, newunit=lu, iostat=ios, iomsg=iom, status='UNKNOWN')
-   if (ios/=0) then
-       write(*,*) 'iostat = ', ios
-       write(*,*) 'iomsg: '//trim(iom)
-       stop
-   end if
-   !call write_hy3(lu,hypo,startpt,marr,arrs,hyp,modfn,covM,info)
+end subroutine setpar_name_o
 
-   close (UNIT = lu,status='KEEP')
+subroutine setpar_model(model_err, reading_err, modname) bind(c,name='setpar_model')
+use layers,  only: model_error, reading_error, name_model
+   real(c_double),value,intent(in) :: model_err, reading_err
+   type(C_PTR), value,intent(in) :: modname
 
-end function filehy3_write
+   model_error = real(model_err)
+   reading_error = real(reading_err)
+   call C_F_str(modname, name_model, 255)
 
+end subroutine setpar_model
 
 end module c_f_elalib
-
-!program testhyp
-!
-!use HypFile
-!use Arrivals
-!
-!integer              :: rmsg
-!type(cFileHyp)     :: hyp
-!type(cFileArr)     :: arrs
-!
-!rmsg = hyp%load("test.hyp")
-!rmsg = hyp%dump("testo.hyp")
-!call arrs%fill(hyp)
-!end program testhyp
-

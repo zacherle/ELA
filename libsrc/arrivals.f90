@@ -35,7 +35,8 @@ procedure :: fill => cfilearr_fill
 procedure :: toDateTime => cfilearr_todatetime
 end type cFileArr
 
-type(cFileArr),pointer,public,save   :: parrs
+type(cFileArr),target,save   :: arrs
+type(cFileArr),pointer,public,save   :: parrs => arrs
 
 contains
 

@@ -1,10 +1,10 @@
 module layers
 
 implicit none
-public
 
-real         :: model_error=0.0
-real         :: reading_error=0.016
+real                :: model_error=0.0
+real                :: reading_error=0.016
+character(len=255)  :: name_model = ' '
 
 type         :: cLayers
    character(LEN=5) :: phase=' '

@@ -32,7 +32,7 @@ string file_i;
 string file_o;
 string file_m;
 string file_s;
-double read_err;
+double reading_err;
 double model_err;
 string config_file;
 
@@ -60,7 +60,7 @@ try {
     config.add_options()
         ("model,m", po::value<string>(), "input model file")
         ("stations,s", po::value<string>(), "input list of stations")
-        ("read_err", po::value<double>(&read_err)->default_value(0),
+        ("reading_err", po::value<double>(&reading_err)->default_value(0),
 	 "set error of arrival time observationd [s]")
         ("model_err", po::value<double>(&model_err)->default_value(0),
 	 "set error of propagation times predictions [s]");
@@ -117,7 +117,8 @@ try {
         }
     else if (vm.count("input")) {
         file_o = vm["input"].as<string>();
-	file_o = file_o.substr(0, file_o.find_last_of("."))+".yaml"; 
+	file_o = file_o.substr(file_o.find_last_of("/")+1,file_o.npos); 
+	file_o = "./ela_"+file_o.substr(0, file_o.find_last_of("."))+".hy3"; 
         cout << "Output file: " << file_o << "\n";
         }
     else {
@@ -143,9 +144,9 @@ try {
 	option_missing=true;
         }
 
-    if (vm.count("read_err")) {
-        cout << "Read error: "
-             << vm["read_err"].as<double>() << "\n";
+    if (vm.count("reading_err")) {
+        cout << "Reading error: "
+             << vm["reading_err"].as<double>() << "\n";
         }
 
     if (vm.count("model_err")) {
@@ -166,15 +167,16 @@ try {
 
     if (option_missing) {return 1;}
 
-
-//    read_hyp
-//    read_model
-//    read_stations
-
+string name_model=file_m.substr(file_m.find_last_of("/")+1,file_m.npos); 
+setpar_model(model_err,reading_err, (char*)name_model.c_str());
+// 1)   read_stations     and fill list of stations
 filesta_read((char*)file_s.c_str());
+// 2)   read_hyp          and fill cFileHyp::hyp, cFileArr::arrs
 filehyp_read((char*)file_i.c_str());
+// 3)   read_model        and fill cLayers::velmod(5)
 filemod_read((char*)file_m.c_str());
 
+setpar_name_o((char*)file_o.c_str());
 ela_d_();
 
 return 0;
