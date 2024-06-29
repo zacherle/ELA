@@ -137,8 +137,9 @@ end do
    allocate(w(marr))
    allocate(fjac(marr,4))
 
-   hypo=[x0+0.1, y0+0.1, 2.0, t0-0.5]
-   call loc_hypo_lm(hypo, marr, fvec, fjac, .true. , .false., info)
+   hypo=[x0+0.1, y0+0.1, 7.0, t0-0.5]
+!   call loc_hypo_lm(hypo, marr, fvec, fjac, .true. , .false., info)
+   call loc_hypo_lm(hypo, marr, fvec, fjac, .false., .false., info)
 
    hypo(3) = startpt(3)
    call loc_hypo_lm(hypo, marr, fvec, fjac, .false. , .false., info)

@@ -168,7 +168,7 @@ real, dimension(2*nl) :: ray_z
    end do
 
    tt = tt + sqrt((s_x-ray_x(2*k-jj))**2+(d(1)-ray_z(2*k-jj))**2)/v(1)
-
+!write(*,*) k,tmin,tt
 !   if (commut) then
 !      toas=-v(1)/v(k)
 !   else

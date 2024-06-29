@@ -27,9 +27,17 @@ the modified TRVDRV subroutine (direct wave, refracted wave, head wave).
 - **Flat-Earth Model**: The velocity model assumes that seismic stations are at the earth's surface. Although station elevations are not directly used, the delaying effect of elevation can be mostly accounted for with station delays.
 - **Relative Earthquake Depths**: Due to the flat-earth assumption, earthquake depths are calculated relative to the average local surface, as defined by the nearby seismic stations.
 
-## Installation
 
-The ELA program runs on Linux. To install the program, follow these steps:
+## Install prerequisites
+The ELA program runs on Linux.
+
+
+1. BLAS & LAPACK libraries need to be installed.
+2. Static library libdatetime.a.
+   Download from [[https://github.com/wavebitscientific/datetime-fortran.git]]
+
+## Installation
+To install the program, follow these steps:
 
 1. Clone the ELA repository from GitHub:
    ```bash

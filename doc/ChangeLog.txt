@@ -1,3 +1,7 @@
+2024-06-29 v0.03
+Modify the reflective transform.
+fw_tdx.f90: function dpdo(z_o)   d z_p(z_o)/ d z_o
+
 2024-06-13 v0.02
 For C++ F90 interoperability add:
 c_f_elalib.f90: setpar_model()
