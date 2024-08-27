@@ -133,12 +133,12 @@ real(dp),dimension(7,m) :: g
 integer                 :: ngather
 
    call collect_obs_simul(real(x),m,g,ngather)
-   if (ngather < m) then
-       write(*,*) 'ngather<m ', ngather,m
-       ngather=m
-   end if
+!   if (ngather < m) then
+!       write(*,*) 'ngather<m ', ngather,m
+!       ngather=m
+!   end if
 
-   x(4)=sum((g(5,:)-g(1,:))*g(6,:))/sum(g(6,:))
+   x(4)=sum((g(5,1:ngather)-g(1,1:ngather))*g(6,1:ngather))/sum(g(6,1:ngather))
 end subroutine get_topt
 
 subroutine get_res_w(m, n, x, fvec, w)
@@ -153,10 +153,10 @@ real(dp),dimension(7,m) :: gather
 integer                 :: ngather
 
    call collect_obs_simul(real(x),m,gather,ngather)
-   if (ngather < m) then
-       write(*,*) 'ngather<m ', ngather,m
-       ngather=m
-   end if
+!   if (ngather < m) then
+!       write(*,*) 'ngather<m ', ngather,m
+!       ngather=m
+!   end if
 
    fvec=0d0
    w=0d0
@@ -177,10 +177,10 @@ real(dp),dimension(7,m) :: gather
 integer                 :: ngather
 
    call collect_obs_simul(real(x),m,gather,ngather)
-   if (ngather < m) then
-       write(*,*) 'ngather<m ', ngather,m
-       ngather=m
-   end if
+!   if (ngather < m) then
+!       write(*,*) 'ngather<m ', ngather,m
+!       ngather=m
+!   end if
 
    fjac=0d0
    w=0d0

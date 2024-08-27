@@ -175,9 +175,4 @@ return
 
 end subroutine cfilearr_fill
 
-!      if (type(i) .eq. 'S') then
-!      else if (type(i) .eq. 'P') then
-!      else
-!         write (*,'(1x," : Wrong type of arrival in record ",i2)') i
-!      endif
 end module Arrivals

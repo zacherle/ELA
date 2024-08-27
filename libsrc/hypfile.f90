@@ -61,27 +61,8 @@ integer            :: iline
      return
    endif
 
-   read (cbuf,'(a5)') r%sta
-
-   r%phase = ''
-      iline=index(cbuf(6:),'P');
-      if (iline .gt. 0) then
-         r%phase = 'P'
-      endif
-   if (iline .le. 0) then
-      iline=index(cbuf(6:),'S');
-      if (iline .gt. 0) then
-         r%phase = 'S'
-      endif
-   endif
-   if (iline .le. 0) then
-      res = -1
-      return
-   endif
-
-   iline = iline + 6
-
-   read (cbuf(iline:),*)&
+   read (cbuf,*)&
+      &r%sta, r%phase,&
       &r%ichan, r%year, r%month, r%day,&
       &r%hour, r%minute, r%isec, r%msec,&
       &r%micros, r%wt, r%amp_d, r%pol,&
@@ -99,7 +80,7 @@ class(cRecordHyp), intent(in) ::  r
      &r%micros, int(r%wt), r%amp_d, r%pol,&
      &r%amp_v, r%period
 
-101   format(a5,1x,a1,1x,i2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,&
+101   format(a5,1x,a,1x,i2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,&
       &1x,i3.3,1x,i3.3,1x,i1,1x,1pe12.6,2x,i1,1x,1pe12.6,1x,1pe12.6)
 
 end subroutine recordhyp_write
@@ -114,7 +95,7 @@ class(cRecordHyp), intent(in) ::  r
      &r%micros, (r%wt), r%amp_d, r%pol,&
      &r%amp_v, r%period
 
-101   format(a5,1x,a1,1x,i2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,&
+101   format(a5,1x,a,1x,i2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,1x,i2.2,&
       &1x,i3.3,1x,i3.3,1x,f5.0,1x,1pe12.6,2x,i1,1x,1pe12.6,1x,1pe12.6)
 
 end subroutine recordhyp_write_hyr

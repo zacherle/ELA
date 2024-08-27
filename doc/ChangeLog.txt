@@ -1,3 +1,9 @@
+2024-08-27 v0.04
+Read seismic phases of any type (hypfile.f90) and work
+with those for which the velocity model is specified.
+Assign zero weight (gather.f90) to the remaining seismic
+phases.
+
 2024-06-29 v0.03
 Modify the reflective transform.
 fw_tdx.f90: function dpdo(z_o)   d z_p(z_o)/ d z_o

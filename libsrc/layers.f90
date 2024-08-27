@@ -99,6 +99,7 @@ function get_layers(ph) result(lptr)
 
    lptr=>null()
    do i=1,5
+!   write(*,*) ';',ph,';',i,';',velmod(i)%phase,';',velmod(i)%n_layers 
       if (velmod(i)%n_layers .gt. 0) then
          if (index(velmod(i)%phase,ph).eq.1) then
             lptr=>velmod(i)

@@ -13,7 +13,8 @@ real             :: hypodist, mag
 
 mag=-9.9
 if (r%amp > 0.0 .and.&
-    &(r%phase(1:1) .eq. 'S' .or. r%phase(1:1) .eq. 's')) then
+    &(r%phase(1:1) .eq. 'S' .or.&
+    & r%phase(1:1) .eq. 's' .or. r%phase(1:1) .eq. 'L')) then
 
     hypodist=sqrt((r%X-hypo(1))**2+(r%Y-hypo(2))**2+(r%Z-hypo(3))**2)
     mag=log10(r%amp/6.283/r%freq*2.8*1e6/0.6325)+0.1+1.4*log10(hypodist)

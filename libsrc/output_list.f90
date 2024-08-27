@@ -115,14 +115,14 @@ real    ::  smag, smag2
 ! header for station data
    write (lu,&
    &'("----------------------------------------------------------",&
-   &  "-------------")')
-   write (lu,'(" sta   |obs. t.|cal. t.|res. |amplitude"&
+   &  "---------------")')
+   write (lu,'(" sta     |obs. t.|cal. t.|res. |amplitude"&
    &,"|freq|w| epi |hypo |azm|ain|xmag")')
-   write(lu, '("       |  [s]  |  [s]  | [s] |  [m/s]  "&
+   write(lu, '("         |  [s]  |  [s]  | [s] |  [m/s]  "&
    &,"|[Hz]| |[km] |[km] |[o]|[o]|    ")')
    write (lu,&
    &'("----------------------------------------------------------",&
-   &  "-------------")')
+   &  "---------------")')
 
    meridian_con = mconvergence(hypo(1),hypo(2))
 ! station data
@@ -135,41 +135,50 @@ real    ::  smag, smag2
      a = arrs%arr(i)
      r = hyp%rec(a%id)
      aobs=a%trec   !g(5,i)
-     acal=g(1,i)+hypo(4)
-     ares=aobs-acal
      dx=hypo(1)-a%X
      dy=hypo(2)-a%Y
      dz=hypo(3)-a%Z
      dhypo = sqrt(dx**2+dy**2+dz**2)
      depi  = sqrt(dx**2+dy**2)
      aaz = real(mod(720.0+atan2(dy,dx)*RAD2DEG-180.0-meridian_con     ,360.0))
-     if (a%wt > 0.0) then
-         j=j+1
-         az(j)=aaz
-     end if
-     amag=localmagnitude(hypo(1:3),a)
-     if (amag > -9.9) then
-         nmag=nmag+1
-         smag=smag+amag
-         smag2=smag2+amag**2
-     end if
-     atoa=g(7,i)
-
-     write(lu,100, advance='no') r%sta, r%phase, aobs, acal, ares,&
+     if (g(1,i) .gt. 0.0) then
+        acal=g(1,i)+hypo(4)
+        ares=aobs-acal
+        if (a%wt > 0.0) then
+           j=j+1
+           az(j)=aaz
+        end if
+        amag=localmagnitude(hypo(1:3),a)
+        if (amag > -9.9) then
+           nmag=nmag+1
+           smag=smag+amag
+           smag2=smag2+amag**2
+        end if
+        atoa=g(7,i)
+        write(lu,100, advance='no') r%sta, r%phase, aobs, acal, ares,&
              &a%amp,a%freq,nint(r%wt),depi,dhypo,nint(aaz),nint(atoa)
-     if (a%phase(1:1).eq.'S') then
-         write(lu,'(f4.1)') amag
-     else
-         write(lu,*) 
-     end if
+        if (a%phase(1:1).eq.'S' .or.&
+           &a%phase(1:1).eq.'s' .or. a%phase(1:1).eq.'L') then
+            write(lu,'(f4.1)') amag
+        else
+            write(lu,*) 
+        end if  ! phase S 
+     else  ! t_cal < 0
+        write(lu,101, advance='no') r%sta, r%phase, aobs,            &
+             &a%amp,a%freq,nint(r%wt),depi,dhypo,nint(aaz)
+        write(lu,*) 
+     end if ! t_cal < 0
    end do
    gap=maxgap(j,az)
    !sum((res*w)**2)/sum(w)
    rmsres=sqrt(sum(((g(5,:)-g(1,:)-hypo(4))*g(6,:))**2)/sum(g(6,:)))
 
-100   format (a5,' ',a1,'|',&
+100   format (a5,' ',a3,'|',&
           &f7.2,   '|',f7.2,   '|',f5.3,'|',1pe9.2,'|',0pf4.1,&
           &'|',i1,'|',0pf5.1,'|',0pf5.1,'|',i3,'|',i3,'|')
+101   format (a5,' ',a3,'|',&
+          &f7.2,   '|',7X  ,   '|',5X  ,'|',1pe9.2,'|',0pf4.1,&
+          &'|',i1,'|',0pf5.1,'|',0pf5.1,'|',i3,'|',3X,'|')
 
 ! error ellipse
   call get_errellipse(co,dxer,dyer,dzer,dter,l1,l2,theta)

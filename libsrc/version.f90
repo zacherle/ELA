@@ -1,5 +1,5 @@
 module version
 
-   character(LEN=25), parameter :: pversion = 'rev. 2024-06 - v.0.03'
+   character(LEN=25), parameter :: pversion = 'rev. 2024-08 - v.0.04'
 
 end module version
