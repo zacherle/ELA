@@ -1,5 +1,5 @@
 
-subroutine loc_hypo_lm(hypo, m, fvec, fjac, fix_depth, fix_surface, info)
+subroutine loc_hypo_lm(hypo, m, fvec, fjac, fix_depth, info)
 
 !use povrch,             only: relief8
 use fw_tdx, only: Xp, Xo, tdx3, tdxder  !, tdxdif
@@ -9,10 +9,6 @@ implicit none
 integer, parameter :: dp=kind(1.0d0)
 
 interface
-
-!   subroutine td_all(c_hypo)
-!      real, dimension(3), intent(IN) :: c_hypo
-!   end subroutine td_all
 
    subroutine fdjac2(fcn, m, n, x, Fvec, Fjac, Ldfjac, Iflag, Epsfcn, Wa)
 use iso_fortran_env, only: wp => real64
@@ -165,14 +161,14 @@ use iso_fortran_env, only: wp => real64
 
 end interface
 
-real, dimension(4), intent(INOUT)     :: hypo
+real(dp), dimension(4), intent(INOUT) :: hypo
 integer, intent(IN)                   :: m
 real(dp), dimension(m), intent(OUT)   :: fvec(m)
 real(dp), dimension(m,4), intent(OUT) :: fjac(m, 4)
-logical, intent(IN)  :: fix_depth, fix_surface
+logical, intent(IN)  :: fix_depth
 integer, intent(OUT) :: info
 
-real(dp),dimension(4) :: xp4, x
+real(dp),dimension(4) :: x
 real(dp) :: tol
 integer :: ipvt(size(x))
 real(dp), allocatable :: wa(:)
@@ -181,21 +177,18 @@ real(dp), allocatable :: wa(:)
 
 tol = sqrt(epsilon(1._dp))
 
-xp4=hypo
-
 if (fix_depth) then
         ! 5*n+m
         allocate(wa(5*size(x) + size(fvec)))
-        x = xp4
+        x = hypo
         call lmder1(tdx3, m, size(x), x, fvec, fjac, size(fjac, 1), 100*tol, &
                 info, ipvt, wa, size(wa))
         deallocate(wa)
 else
         ! m*n+5*n+m.
         allocate(wa(size(fvec)*size(x)+5*size(x) + size(fvec)))
-        !x = xp4
-!        x = Xo(xp4,relief8(xp4(1),xp4(2)))
-        x = Xo(xp4,0d0)
+!        x = Xo(hypo,relief8(hypo(1),hypo(2)))
+        x = Xo(hypo,0d0)
         call lmder1(tdxder, m, size(x), x, fvec, fjac, size(fjac, 1), tol, &
                 info, ipvt, wa, size(wa))
         deallocate(wa)
@@ -208,8 +201,6 @@ print 1000, enorm(m, fvec), info, x
             5x, 'EXIT PARAMETER', 16x, i10              // &
             5x, 'FINAL APPROXIMATE SOLUTION'            // &
             5x, 4d15.7)
-
-
-hypo=real(x)
+hypo=x
 
 end subroutine loc_hypo_lm

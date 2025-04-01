@@ -1,3 +1,7 @@
+2025-03-01 v0.05
+If the xyz coordinates of the hypocenter are given, solve
+the forward problem.
+
 2024-08-27 v0.04
 Read seismic phases of any type (hypfile.f90) and work
 with those for which the velocity model is specified.

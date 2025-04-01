@@ -6,7 +6,7 @@ use gather_module,      only: collect_obs_simul
 implicit none
 
 private
-public Xp, Xo, tdx3, tdxder, get_res_w, get_G_w
+public Xp, Xo, tdx3, tdxder, get_res_w, get_G_w, get_topt
 
 integer, parameter :: dp=kind(0d0)
 
