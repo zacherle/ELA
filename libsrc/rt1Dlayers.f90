@@ -6,26 +6,26 @@
 !**************************************************************************
 
 !subroutine raytr1D (s_x,s_z, nl,d,v, nray,ray_x,ray_z, tt,raypar,type_of_wave)
-subroutine raytr1D (s_x,s_z, nl,d,v, tt,raypar,type_of_wave)
+subroutine raytr1D (s_x,s_z, nl,d,v, tt,raypar,type_of_wave) bind(c, name="raytr1D")
+use iso_c_binding
 
 implicit none
 
-real,               intent(IN)  :: s_x
-real,               intent(IN)  :: s_z
-
+real(c_double), intent(IN)  :: s_x
+real(c_double), intent(IN)  :: s_z
 ! 1D model
-integer           , intent(IN)  :: nl
-real, dimension(:), intent(IN)  :: d
-real, dimension(:), intent(IN)  :: v
+integer,               intent(IN)  :: nl
+real(c_float), dimension(:), intent(IN)  :: d
+real(c_float), dimension(:), intent(IN)  :: v
+
+real(c_double),            intent(OUT) :: tt
+real(c_double),            intent(OUT) :: raypar
+integer,                  intent(OUT) :: type_of_wave
 
 !!ray
 !integer,            intent(OUT) :: nray
 !real, dimension(:), intent(OUT) :: ray_x    !2*m_layer
 !real, dimension(:), intent(OUT) :: ray_z
-
-real,               intent(OUT) :: tt
-real(8),            intent(OUT) :: raypar
-integer,            intent(OUT) :: type_of_wave
 
 !all coordinates are aligned with the depth-layer system
 !z-axis is downward

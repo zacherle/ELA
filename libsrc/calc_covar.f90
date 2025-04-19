@@ -1,14 +1,19 @@
 module calc_covar
 use, intrinsic :: iso_fortran_env, only : real64
 
-use layers,       only: model_error, reading_error
-use const_raddeg
+!use layers,       only: model_error, reading_error
+!use const_raddeg
 
 implicit none
+
+double precision, parameter :: RAD2DEG=57.295779513082320876
 
 contains
 
 subroutine eigv_sym4(a,w)
+! Computes the eigenvalues and eigenvectors of a 4x4 symmetric matrix using LAPACK's dsyev.
+! The matrix 'a' (dimension 4x4) is stored in column‐major order.
+! On exit, if successful, a contains the orthonormal eigenvectors and w holds the eigenvalues.
 
 integer, parameter :: n = 4
 integer, parameter :: lda = n
@@ -87,12 +92,13 @@ real(real64), dimension(lwmax) :: work
 
 end subroutine eigv_sym4
 
-function cov_matrix1(m,n,resw,Gw,w)
+function cov_matrix1(m,n,resw,Gw,w,reading_error,model_error)
 !covariance matrix
 integer, intent(IN)          :: m,n
 real(real64), dimension(m), intent(IN)   :: resw
 real(real64), dimension(m), intent(IN)   :: w
 real(real64), dimension(m,n), intent(IN) :: Gw
+real, intent(IN) :: reading_error,model_error
 real(real64), dimension(n,n) :: cov_matrix1
 
 real(real64), parameter :: kappa=1.0d-08
@@ -160,6 +166,12 @@ end function cov_matrix1
 
 
 subroutine get_errellipse(co,dxer,dyer,dzer, dter,l1,l2,theta)
+! Computes the error ellipse parameters from a 4x4 covariance matrix 'co' stored in column‐major order.
+! Output parameters:
+! dxer, dyer : The square roots of the absolute values of co(1,1) and co(2,2).
+! dzer, dter : The square roots of the absolute values of co(3,3) and co(4,4).
+! l1, l2     : The lengths of the major and minor axes of the error ellipse.
+! theta      : The orientation angle of the error ellipse (in degrees).
 
 real(real64), dimension(4,4),intent(IN) :: co
 real,intent(OUT) ::   dxer,dyer,dzer,dter

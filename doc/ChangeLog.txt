@@ -1,3 +1,9 @@
+2025-04-19 branch convcpp
+Rewrite libsrc to c++
+
+2025-04-01 branch convcpp
+Convert code from f90 to c++ using codeconv.ai
+
 2025-03-01 v0.05
 If the xyz coordinates of the hypocenter are given, solve
 the forward problem.
