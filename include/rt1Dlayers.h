@@ -5,9 +5,9 @@
 extern"C" {
 #endif
 
-void raytr1D(double s_x, double s_z,
-	       	int nl, float* d, float* v,
-	       	double tt, double raypar, int type_of_wave);
+void raytr1D(const double s_x, const double s_z,
+	       	const int nl, const float d[], const float v[],
+	       	double* tt, double* raypar, int* type_of_wave);
 		 
 #ifdef __cplusplus
 }

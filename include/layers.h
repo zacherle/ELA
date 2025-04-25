@@ -17,10 +17,9 @@ struct TLayers{
     std::vector<float> v;
 };
 
+void loadLayersPointerMap(const std::string& filename);
+void printLayersPointerMap();
+
 extern std::map<std::string, std::shared_ptr<TLayers>> p_layers_map;
 std::shared_ptr<TLayers> getLayersPointer(const std::string& ph);
-//namespace layers {
-extern double model_error;
-extern double reading_error;
-//} // namespace layers
 #endif // LAYERS_H

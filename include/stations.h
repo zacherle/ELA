@@ -12,6 +12,7 @@ struct TStation {
 };
 
 void loadStations(const std::string& filename);
+void printStations();
 
 extern std::map<std::string, TStation> stations;
 #endif // STATIONS_H

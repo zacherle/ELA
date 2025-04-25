@@ -47,12 +47,12 @@ void hy3print(struct hy3_file * hy3) {
 		   hy3->ref_time.tm_hour, hy3->ref_time.tm_min);
 
    // header for station data
-   printf("\n-------------------------------------------------------------------------");
-   printf("\n sta     |obs. t.|cal. t.|res. |amplitude|freq|w| epi |hypo |azm|ain|xmag");
-   printf("\n         |  [s]  |  [s]  | [s] |  [m/s]  |[Hz]| |[km] |[km] |[o]|[o]|    ");
-   printf("\n-------------------------------------------------------------------------");
+   printf("\n--------------------------------------------------------------------------");
+   printf("\n sta     |obs. t.|cal. t.|res.  |amplitude|freq|w| epi |hypo |azm|ain|xmag");
+   printf("\n         |  [s]  |  [s]  | [s]  |  [m/s]  |[Hz]| |[km] |[km] |[o]|[o]|    ");
+   printf("\n--------------------------------------------------------------------------");
    for (irec=0;irec<hy3->nrec;irec++) {
-	   printf("\n%5s %3s|% 7.2f|% 7.2f|%5.2f|%9.2e|%4.1f|%2.0f|%5.1f|%5.1f|%5.1f|%5.1f|", 
+	   printf("\n%5s %3s|% 7.2f|% 7.2f|%6.3f|%9.2e|%4.1f|%2.0f|%5.1f|%5.1f|%5.1f|%5.1f|", 
 		   hy3->rec[irec].sta, hy3->rec[irec].ph,
 		   hy3->rec[irec].obs_t, hy3->rec[irec].cal_t, hy3->rec[irec].res,
 		   hy3->rec[irec].amp, hy3->rec[irec].freq,
@@ -469,6 +469,7 @@ int hy3load (struct hy3_file *hy3, FILE *fin) {
 }
 
 // Program to test the reading of the hypo3d file
+/*
 int main (int argc, char *argv[]) {
 
   #define MAXREC 180
@@ -497,3 +498,4 @@ int main (int argc, char *argv[]) {
 
   return (0);
 }
+*/

@@ -22,4 +22,7 @@ struct TRecordHyp {
 
 extern std::vector<TRecordHyp> hyp;
 
+void loadHyp(const std::string& filename);
+void printHyp();
+
 #endif // HYPFILE_H

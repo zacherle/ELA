@@ -1,5 +1,6 @@
 module calc_covar
 use, intrinsic :: iso_fortran_env, only : real64
+use, intrinsic :: iso_c_binding, only : c_double, c_float, c_int
 
 !use layers,       only: model_error, reading_error
 !use const_raddeg
@@ -92,14 +93,14 @@ real(real64), dimension(lwmax) :: work
 
 end subroutine eigv_sym4
 
-function cov_matrix1(m,n,resw,Gw,w,reading_error,model_error)
+subroutine cov_matrix2(cov,m,n,resw,Gw,w,reading_error,model_error) bind(C,name='cov_matrix2')
 !covariance matrix
-integer, intent(IN)          :: m,n
-real(real64), dimension(m), intent(IN)   :: resw
-real(real64), dimension(m), intent(IN)   :: w
-real(real64), dimension(m,n), intent(IN) :: Gw
-real, intent(IN) :: reading_error,model_error
-real(real64), dimension(n,n) :: cov_matrix1
+real(c_double), dimension(n,n), intent(OUT) :: cov
+integer(c_int), intent(IN), value          :: m,n
+real(c_double), dimension(m), intent(IN)   :: resw
+real(c_double), dimension(m), intent(IN)   :: w
+real(c_double), dimension(m,n), intent(IN) :: Gw
+real(c_double), intent(IN), value :: reading_error,model_error
 
 real(real64), parameter :: kappa=1.0d-08
 
@@ -159,13 +160,12 @@ end if
 ! model error
    varD=varD+model_error**2
 
+cov=covM*varD
 
-cov_matrix1=covM*varD
-
-end function cov_matrix1
+end subroutine cov_matrix2
 
 
-subroutine get_errellipse(co,dxer,dyer,dzer, dter,l1,l2,theta)
+subroutine get_errellipse(co,dxer,dyer,dzer, dter,l1,l2,theta) BIND(C,name='get_errellipse')
 ! Computes the error ellipse parameters from a 4x4 covariance matrix 'co' stored in column‐major order.
 ! Output parameters:
 ! dxer, dyer : The square roots of the absolute values of co(1,1) and co(2,2).

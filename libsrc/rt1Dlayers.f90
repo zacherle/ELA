@@ -7,20 +7,20 @@
 
 !subroutine raytr1D (s_x,s_z, nl,d,v, nray,ray_x,ray_z, tt,raypar,type_of_wave)
 subroutine raytr1D (s_x,s_z, nl,d,v, tt,raypar,type_of_wave) bind(c, name="raytr1D")
-use iso_c_binding
+use, intrinsic :: iso_c_binding, only: c_double, c_float, c_int
 
 implicit none
 
-real(c_double), intent(IN)  :: s_x
-real(c_double), intent(IN)  :: s_z
+real(c_double), intent(IN), value  :: s_x
+real(c_double), intent(IN), value  :: s_z
 ! 1D model
-integer,               intent(IN)  :: nl
-real(c_float), dimension(:), intent(IN)  :: d
-real(c_float), dimension(:), intent(IN)  :: v
+integer(c_int),              intent(IN), value  :: nl
+real(c_float), dimension(*), intent(IN)  :: d
+real(c_float), dimension(*), intent(IN)  :: v
 
 real(c_double),            intent(OUT) :: tt
 real(c_double),            intent(OUT) :: raypar
-integer,                  intent(OUT) :: type_of_wave
+integer(c_int),            intent(OUT) :: type_of_wave
 
 !!ray
 !integer,            intent(OUT) :: nray
@@ -65,6 +65,8 @@ real, dimension(2*nl) :: ray_z
    real, dimension(nl)   :: thk
    real, dimension(nl)   :: vsq
    integer i
+
+   write(*,*) s_x,s_z,nl
 
    type_of_wave=0
 

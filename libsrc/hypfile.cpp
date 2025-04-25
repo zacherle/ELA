@@ -96,7 +96,7 @@ void printHyp() {
 
 // main() for testing
 // load hyp records from file and print them
-
+/*
 int main(int argc, char* argv[]) {
 	if (argc != 2) {
 		std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
@@ -108,4 +108,4 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
-
+*/

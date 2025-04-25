@@ -16,11 +16,8 @@
 #include "wgsjtsk.h"
 #include "hy3file.h"
 #include "magni.h"
-
-
-extern "C" void get_errellipse_(const double* co,
-	       	float dxer, float dyer, float dzer, float dter,
-	       	float l1, float l2, float theta);
+#include "calc_covar.h"
+#include "param.h"
 
 double mconvergence(double X, double Y)
 {
@@ -33,7 +30,7 @@ float maxgap(std::vector<float>& az)
 {
     std::sort(az.begin(), az.end());
     float max_gap = 0.0f;
-    for (int i = 1; i < az.size(); i++) {
+    for (int i = 1; i < (int) az.size(); i++) {
          float gap = az[i] - az[i-1];
          if(gap > max_gap) max_gap = gap;
     }
@@ -42,25 +39,26 @@ float maxgap(std::vector<float>& az)
     return max_gap;
 }
 
-void output_hy3(struct hy3_file hy3, int marr,
-	       	const double hypo[4], const float startpoint[4],
-		const CArrivalFile &arrs, std::vector<TRecordHyp> &hyp, Gather &gather,
-		const std::string &modfn, const double* co, int info)
+void output_hy3(struct hy3_file &hy3, TParams &param, const double hypo[4],
+	       	const CArrivalFile &arrs, std::vector<TRecordHyp> &hyp, Gather &gather,
+		const double* co, int info)
 { 
 /// Output the results of the inversion to the hy3file struct
 
-
-    modfn.copy(hy3.model, 40);
-    //hy3.model_error = model_error;
-    //hy3.reading_error = reading_error;
-    //hy3.event =
-    hy3.start_x = startpoint[0];
-    hy3.start_y = startpoint[1];
-    hy3.start_z = startpoint[2];
-    hy3.start_t = startpoint[3];
-    //hy3.fix[0] = 0;
-
-
+    int marr = arrs.n_arr;
+    std::size_t length;
+    length = param.name_model.copy(hy3.model, 40); hy3.model[length]='\0';
+    hy3.model_error = param.model_err;
+    hy3.reading_error = param.reading_err;
+    length = param.name_event.copy(hy3.event, 40); hy3.event[length]='\0';
+    hy3.start_x = param.startpt[0];
+    hy3.start_y = param.startpt[1]; 
+    hy3.start_z = param.startpt[2];
+    hy3.start_t = param.startpt[3];
+    hy3.fix[0] = param.fix[0];
+    hy3.fix[1] = param.fix[1];
+    hy3.fix[2] = param.fix[2];
+    hy3.fix[3] = param.fix[3];
     // origin time epoch
     double origin_et=arrs.reftime+hypo[3];
     // the reference time is the origin time round to the nearst minute
@@ -130,8 +128,8 @@ void output_hy3(struct hy3_file hy3, int marr,
         double ares = aobs - acal;
         double atoa = gather.toa[i];
 
-	a.sta.copy(hy3.rec[i].sta,10);
-	a.phase.copy(hy3.rec[i].ph,10);
+	length=a.sta.copy(hy3.rec[i].sta,10); hy3.rec[i].sta[length]='\0';
+	length=a.phase.copy(hy3.rec[i].ph,10); hy3.rec[i].ph[length]='\0';
 	hy3.rec[i].obs_t = aobs;
 	hy3.rec[i].cal_t = acal;
 	hy3.rec[i].res = ares;
@@ -145,6 +143,7 @@ void output_hy3(struct hy3_file hy3, int marr,
 	hy3.rec[i].xmag = static_cast<float>(amag);
 
     } // end do loop
+    hy3.nrec = arrs.n_arr;
 
     // azimuthal gap
     hy3.gap = maxgap(az);
@@ -169,7 +168,7 @@ void output_hy3(struct hy3_file hy3, int marr,
 
     // error ellipse
     float dxer, dyer, dzer, dter, l1, l2, theta;
-    get_errellipse_(co, dxer, dyer, dzer, dter, l1, l2, theta);
+    get_errellipse(co, &dxer, &dyer, &dzer, &dter, &l1, &l2, &theta);
     hy3.x[0] = hypo[0];
     hy3.x[1] = dxer;
     hy3.y[0] = hypo[1];
@@ -195,7 +194,9 @@ void output_hy3(struct hy3_file hy3, int marr,
     hy3.lat = fi;
     hy3.z[0] = hypo[2];
     hy3.z[1] = dzer;
-    return;
+
+    // return value
+    hy3.info = info;
 
 } // end output_hy3
 

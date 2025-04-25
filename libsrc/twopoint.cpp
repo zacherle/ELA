@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <algorithm>
+
 #include "rt1Dlayers.h" // contains the definition of raytr1D
 /*
 struct TLayers{
@@ -73,10 +74,10 @@ void two_point_td(const double (&srcxyz)[3], const double (&obsxyz)[3],
     double toas;
     double toac;
     double raypar;
-    int type_of_wave;
     double v_hypo;
     double delta;
-    double tt;
+    double tt=-1.0;
+    int type_of_wave=-1;
 
     if (!lptr) {
         td[0] = -1.0;
@@ -91,8 +92,8 @@ void two_point_td(const double (&srcxyz)[3], const double (&obsxyz)[3],
         delta = 0.0001;
     }
 
- 
-    raytr1D(delta, srcxyz[2], nl, lptr->z.data(), lptr->v.data(), tt, raypar, type_of_wave);
+    raytr1D(delta, srcxyz[2], nl, lptr->z.data(), lptr->v.data(),
+		    &tt, &raypar, &type_of_wave);
 
     v_hypo = get1Dvel(srcxyz[2], nl, lptr->z, lptr->v);
 
@@ -101,7 +102,7 @@ void two_point_td(const double (&srcxyz)[3], const double (&obsxyz)[3],
     td[2] = -raypar * (obsxyz[1] - srcxyz[1]) / delta;
     td[3] = 0.0;
     toas = raypar * v_hypo;
-    toac = std::sqrt(1.0 - toas * toas);
+    toac = std::sqrt(1.0 - toas*toas);
     if (std::isnan(toac)) {
         toas = 1.0;
         toac = 0.0;
@@ -121,6 +122,7 @@ void two_point_td(const double (&srcxyz)[3], const double (&obsxyz)[3],
 // print the index of the value in the vector x
 // and x[index] and v[index] to the console
 // return 0
+/*
 int main(int argc, char* argv[]) {
     std::vector<float> x = {0.0, 1.0, 2.0, 3.0, 4.0};
     std::vector<float> v = {5.0, 6.0, 7.0, 8.0, 9.0};
@@ -141,5 +143,5 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-
+*/
 

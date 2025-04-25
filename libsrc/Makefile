@@ -24,15 +24,15 @@ SRC:= hypfile.cpp \
     arrivals.cpp \
     stations.cpp \
     magni.cpp \
-    wgsjtsk.cpp \
     rt1Dlayers.f90 \
     calc_covar.f90 \
     layers.cpp \
     gather.cpp \
     fw_tdx.cpp \
-    output_list.cpp \
+    output_hy3.cpp \
     twopoint.cpp \
-    hy3file.c
+    hy3file.c \
+    wgsjtsk.c
 
 OBJ_2 = $(SRC:.c=.o)
 OBJ_1 = $(OBJ_2:.cpp=.o)
@@ -61,14 +61,13 @@ $(LIB): $(OBJ)
 
 #
 
-arrivals.o: ../include/hypfile.h ../include/datetime.hpp
+arrivals.o: ../include/hypfile.h
 arrivals.o: ../include/stations.h ../include/arrivals.h
 fw_tdx.o: ../include/gather.h
 gather.o: ../include/arrivals.h ../include/hypfile.h ../include/stations.h
 gather.o: ../include/twopoint.h ../include/gather.h
 hypfile.o: ../include/hypfile.h
 layers.o: ../include/layers.h
-layers1.o: ../include/layers.h
 magni.o: ../include/arrivals.h ../include/hypfile.h ../include/stations.h
 output_list.o: ../include/version.h ../include/arrivals.h
 output_list.o: ../include/hypfile.h ../include/stations.h
@@ -79,3 +78,4 @@ stations.o: ../include/stations.h
 twopoint.o: ../include/rt1Dlayers.h ../include/layers.h
 rt1Dlayers.o : rt1Dlayers.f90 
 calc_covar.o : calc_covar.f90 
+hy3file.o: ../include/version.h

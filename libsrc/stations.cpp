@@ -93,7 +93,7 @@ void printStations() {
 // the file name is passed as a command line argument
 // for example:
 // ./stations stations.txt
-
+/*
 int main(int argc, char* argv[]) {
 	if (argc != 2) {
 		std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
@@ -105,4 +105,4 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
-
+*/

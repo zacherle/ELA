@@ -3,6 +3,7 @@
 namespace po = boost::program_options;
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <iterator>
 #include <exception>
@@ -15,16 +16,17 @@ using std::exception;
 //using std::vector;
 using std::string;
 
-#include "../include/c_f_elalib.h"
+#include "param.h"
+#include "stations.h"
+#include "layers.h"
+#include "hypfile.h"
+#include "arrivals.h"
+#include "gather.h"
+#include "output_hy3.h"
+#include "hy3file.h"
 
-#ifdef __cplusplus
-extern"C" {
-#endif
-void ela_d_(void);
-#ifdef __cplusplus
-}
-#endif
-
+int get_hypo(const CArrivalFile & arrs, const TParams &param,
+	       std::array<double,4> & hypo, double (& covM)[4][4]);
 
 int main(int ac, char** av){
 
@@ -167,17 +169,162 @@ try {
 
     if (option_missing) {return 1;}
 
-string name_model=file_m.substr(file_m.find_last_of("/")+1,file_m.npos); 
-setpar_model(model_err,reading_err, (char*)name_model.c_str());
-// 1)   read_stations     and fill list of stations
-filesta_read((char*)file_s.c_str());
-// 2)   read_hyp          and fill cFileHyp::hyp, cFileArr::arrs
-filehyp_read((char*)file_i.c_str());
-// 3)   read_model        and fill cLayers::velmod(5)
-filemod_read((char*)file_m.c_str());
+struct TParams param;
+param.reading_err=reading_err;
+param.model_err=model_err;
+param.name_model=file_m.substr(file_m.find_last_of("/")+1,file_m.npos);
+param.name_event=file_i.substr(file_i.find_last_of("/")+1,file_i.npos);
+param.name_event=param.name_event.substr(0, param.name_event.find_last_of("."));
 
-setpar_name_o((char*)file_o.c_str());
-ela_d_();
+
+    // initial point
+    std::array<double,4> startpt{0.0};
+    bool init_nea = false;
+
+do {
+    // start point
+    startpt = {0.0, 0.0, 0.0, 0.0};
+    std::cout << " Start point [X,Y,Z]\n"
+              << "       orig. time given by minimizing procedure\n"
+              << "       space coord. = 0 ... value of the nearest station\n"
+              << "       [0,0,0,0]:_";
+    std::string line;
+    if (!std::getline(std::cin, line)) {
+        continue;
+    }
+    if (line.empty()) {
+        init_nea = true;
+	break;
+    } else {
+	// numbers are separated by spaces or commas
+	if (line.find(',') != std::string::npos) {
+	    // replace commas with spaces
+	    std::replace(line.begin(), line.end(), ',', ' ');
+	}
+        std::istringstream iss(line);
+        // Attempt to read 4 values into startpt.
+        if (!(iss >> startpt[0] >> startpt[1] >> startpt[2])) {
+            continue; // Error: not enough values or invalid input
+		      // continue to prompt again
+	}
+        if (!(iss >> startpt[3])) {
+	    startpt[3] = 0.0; // Default value for the 4th element
+	}
+
+	break; // exit the loop
+    }
+} while (true);
+	
+    std::cout << startpt[0] << " " << startpt[1] << " " 
+              << startpt[2] << " " << startpt[3] << " " << init_nea << "\n";
+
+
+    bool fix_x = false;
+    bool fix_y = false;
+    bool fix_depth = false;
+
+do {
+    // fixed coordinates of the epicenter
+    fix_x = false;
+    fix_y = false;
+    fix_depth = false;
+    std::cout << " Enter fixed coordinates of the epicenter:\n"
+              << "         Fixed coordinates XYZ   -  ''X or Y or XYZ''\n"
+              << "         Fixed depth             -  ''Z''   [ ]:_";
+    std::string line;
+    if (!std::getline(std::cin, line)) {
+        continue;
+    }
+    if (line.empty()) {
+        break; // default values
+    } else {
+        // Check for 'X' or 'x'
+        if (line.find('X') != std::string::npos || line.find('x') != std::string::npos) {
+            fix_x = true;
+	    break;
+        }
+        // Check for 'Y' or 'y'
+        if (line.find('Y') != std::string::npos || line.find('y') != std::string::npos) {
+            fix_x = true;
+	    break;
+        }
+        // Check for 'Z' or 'z'
+        if (line.find('Z') != std::string::npos || line.find('z') != std::string::npos) {
+            fix_depth = true;
+	    break;
+        }
+    }
+} while (true);
+
+    std::cout << fix_x << " " << fix_y << " " << fix_depth << "\n";
+
+param.fix = {fix_x, fix_y, fix_depth, false};
+param.init_nea = init_nea;   
+param.startpt = startpt;
+
+// if X o Y coordinates are fixed, then all X, Y, Z coordinates are fixed
+if (param.fix[0] || param.fix[1]) {
+	param.fix[0] = true;
+	param.fix[1] = true;
+	param.fix[2] = true;
+}
+
+
+std::cout << " Event name: " << param.name_event << "\n";
+std::cout << " Model name: " << param.name_model << "\n";
+std::cout << " Model error: " << param.model_err << "\n";
+std::cout << " Reading error: " << param.reading_err << "\n";
+std::cout << " Start point: " << param.startpt[0] << " "
+	  << param.startpt[1] << " " << param.startpt[2] << " "
+	  << param.startpt[3] << "\n";
+std::cout << " Fix X: " << param.fix[0] << "\n";
+std::cout << " Fix Y: " << param.fix[1] << "\n";
+std::cout << " Fix Z: " << param.fix[2] << "\n";
+std::cout << " Fix T: " << param.fix[3] << "\n";
+std::cout << " Init NEA: " << param.init_nea << "\n";
+
+
+
+    // read hyp file and fill 'hyp' - vector of TRecordHyp
+//    std::map<string, TStation> stations;
+//    std::map<std::string, std::shared_ptr<TLayers>> p_layers_map;
+//    CArrivalFile arrs;
+//    std::vector<TRecordHyp> hyp;
+
+    // read stations and fill 'stations' - map of TStation
+    loadStations(file_s);
+    printStations();
+
+    // read model and fill 'p_layers_map' - map of TLayers
+    loadLayersPointerMap(file_m);
+    printLayersPointerMap();
+
+    // read hyp file and fill 'hyp' - vector of TRecordHyp
+    loadHyp(file_i);
+    printHyp();
+
+    // fill 'arrs' - vector of TArrival
+    arrs.fill(hyp, stations);
+    
+    std::array<double,4> hypo{0.0};
+    static double covM[4][4] = {0.0};
+    // locate the hypocenter hypo and covariance matrix covM
+    int info = get_hypo(arrs, param, hypo, covM);
+    //std::cout << "     FINAL L2 NORM OF THE RESIDUALS"
+    //     << std::setw(15) << std::fixed << std::setprecision(7) << enorm(marr, fvec) << std::endl;
+    std::cout << "     EXIT PARAMETER" << std::setw(16) << "" << std::setw(10) << info << std::endl;
+    std::cout << "     FINAL APPROXIMATE SOLUTION";
+    for (size_t i = 0; i < hypo.size(); i++) {
+	    std::cout << std::setw(15) << std::fixed << std::setprecision(7) << hypo[i];
+    }
+    std::cout << std::endl;
+    
+    struct hy3_file hy3;
+    int nrec = arrs.n_arr;
+    hy3.rec = (struct hy3_record *) malloc (nrec * sizeof(struct hy3_record));
+    output_hy3(hy3, param, hypo.data(), arrs, hyp, gather, (double*) covM, info); 
+    hy3print (&hy3);
+
 
 return 0;
 }
