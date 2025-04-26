@@ -323,7 +323,17 @@ std::cout << " Init NEA: " << param.init_nea << "\n";
     int nrec = arrs.n_arr;
     hy3.rec = (struct hy3_record *) malloc (nrec * sizeof(struct hy3_record));
     output_hy3(hy3, param, hypo.data(), arrs, hyp, gather, (double*) covM, info); 
-    hy3print (&hy3);
+    //hy3print (&hy3);
+    
+    // write to file using hy3save
+    FILE *fout;
+    fout = fopen(file_o.c_str(), "wt");
+    if (fout == NULL) {
+	std::cerr << "Error opening file for writing: " << file_o << std::endl;
+	return 1;
+    }
+    
+    hy3save(&hy3, fout);
 
 
 return 0;

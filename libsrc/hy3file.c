@@ -18,72 +18,72 @@ struct date_time
     int second;
   };
 
-void hy3print(struct hy3_file * hy3) {
+void hy3save(struct hy3_file * hy3, FILE *fout) {
 
-   int irec;
-
-   printf ("\nprogram       : %s", getBuildInfo());
-   printf ("\nmodel         : %s", hy3->model);
-   printf ("\nmodel error   :%6.3f", hy3->model_error);
-   printf ("\nreading error :%6.3f", hy3->reading_error);
+   if (!fout) fout = stdout;
+   fprintf(fout,  "program       : %s", getBuildInfo());
+   fprintf(fout, "\nmodel         : %s", hy3->model);
+   fprintf(fout, "\nmodel error   :%6.3f s", hy3->model_error);
+   fprintf(fout, "\nreading error :%6.3f s", hy3->reading_error);
    
    time_t create_time= time(NULL);
    struct tm *tm = localtime(&create_time);
-   printf ("\ncreate time   : %02d-%02d-%02d %02d:%02d:%02d",
+   fprintf(fout, "\ncreate time   : %02d-%02d-%02d %02d:%02d:%02d",
 		   tm->tm_year%100, tm->tm_mon+1, tm->tm_mday,
 		   tm->tm_hour, tm->tm_min, tm->tm_sec);
-   printf ("\nevent         : %s", hy3->event);
-   printf ("\nstart(x,y,z,t): (%6.2f,%6.2f,%6.2f,%6.2f)", hy3->start_x, hy3->start_y,
+   fprintf(fout, "\nevent         : %s", hy3->event);
+   fprintf(fout, "\nstart(x,y,z,t): (%6.2f,%6.2f,%6.2f,%6.2f)", hy3->start_x, hy3->start_y,
 		   hy3->start_z, hy3->start_t);
    // print flags for fixed coordinates
-   printf("\nfixed         : ("); 
-   if (hy3->fix[0] == 1) printf("fix X,"); else printf("      ,");
-   if (hy3->fix[1] == 1) printf("fix Y,"); else printf("      ,");
-   if (hy3->fix[2] == 1) printf("fix Z,"); else printf("      ,");
-   if (hy3->fix[3] == 1) printf("fix T)"); else printf("      )");
-   printf("\n"); 
-   printf ("\nreference time: %02d-%02d-%02d %02d:%02d",
+   fprintf(fout, "\nfixed         : ("); 
+   if (hy3->fix[0] == 1) fprintf(fout, "fix X,"); else fprintf(fout, "      ,");
+   if (hy3->fix[1] == 1) fprintf(fout, "fix Y,"); else fprintf(fout, "      ,");
+   if (hy3->fix[2] == 1) fprintf(fout, "fix Z,"); else fprintf(fout, "      ,");
+   if (hy3->fix[3] == 1) fprintf(fout, "fix T)"); else fprintf(fout, "      )");
+   fprintf(fout, "\n"); 
+   fprintf(fout, "\nreference time: %02d-%02d-%02d %02d:%02d",
 		   hy3->ref_time.tm_year%100, hy3->ref_time.tm_mon+1, hy3->ref_time.tm_mday,
 		   hy3->ref_time.tm_hour, hy3->ref_time.tm_min);
 
    // header for station data
-   printf("\n--------------------------------------------------------------------------");
-   printf("\n sta     |obs. t.|cal. t.|res.  |amplitude|freq|w| epi |hypo |azm|ain|xmag");
-   printf("\n         |  [s]  |  [s]  | [s]  |  [m/s]  |[Hz]| |[km] |[km] |[o]|[o]|    ");
-   printf("\n--------------------------------------------------------------------------");
+   fprintf(fout, "\n---------------------------------------------------------------------------");
+   fprintf(fout, "\n sta     |obs. t.|cal. t.|res.  |amplitude|freq| w| epi |hypo |azm|ain|xmag");
+   fprintf(fout, "\n         |  [s]  |  [s]  | [s]  |  [m/s]  |[Hz]|  |[km] |[km] |[o]|[o]|    ");
+   fprintf(fout, "\n---------------------------------------------------------------------------");
+   int irec;
    for (irec=0;irec<hy3->nrec;irec++) {
-	   printf("\n%5s %3s|% 7.2f|% 7.2f|%6.3f|%9.2e|%4.1f|%2.0f|%5.1f|%5.1f|%5.1f|%5.1f|", 
+	   fprintf(fout, "\n%-5s %-3s|% 7.3f|% 7.3f|%6.3f|%9.2e|%4.1f|%2.0f|%5.1f|%5.1f|%5.1f|%5.1f|", 
 		   hy3->rec[irec].sta, hy3->rec[irec].ph,
 		   hy3->rec[irec].obs_t, hy3->rec[irec].cal_t, hy3->rec[irec].res,
 		   hy3->rec[irec].amp, hy3->rec[irec].freq,
 		   hy3->rec[irec].w,
 		   hy3->rec[irec].epi, hy3->rec[irec].hypo,
 		   hy3->rec[irec].azm, hy3->rec[irec].ain);
-	   if (hy3->rec[irec].xmag > -9.0) printf("%5.2f", hy3->rec[irec].xmag);
+	   if (hy3->rec[irec].xmag > -9.0) fprintf(fout, "%5.2f", hy3->rec[irec].xmag);
    }
 
-   printf("\n"); 
-   printf("\n\nhypocenter data:");
-   printf("\n--------------- ");
+   fprintf(fout, "\n"); 
+   fprintf(fout, "\n\nhypocenter data:");
+   fprintf(fout, "\n--------------- ");
    time_t origin_et = timelocal(&hy3->ref_time)+ (int) hy3->origin_time[0];
    tm = localtime(&origin_et);
-   printf("\norigin time          t:  %02d-%02d-%02d %02d:%02d:%06.3f +-% 7.3f",
+   fprintf(fout, "\norigin time          t:  %02d-%02d-%02d %02d:%02d:%06.3f +-% 7.3f",
 		   tm->tm_year%100, tm->tm_mon+1, tm->tm_mday,
 		   tm->tm_hour, tm->tm_min, hy3->origin_time[0], hy3->origin_time[1]);
-   printf ("\nx-coordinate         x: %8.2f +- %7.2f km     (fi:     %10.6f deg)",
+   fprintf(fout, "\nx-coordinate         x: %8.2f +- %6.2f km     (fi:     %10.6f deg)",
 		   hy3->x[0], hy3->x[1], hy3->lat);
-   printf ("\ny-coordinate         y: %8.2f +- %7.2f km     (lambda: %10.6f deg)",
+   fprintf(fout, "\ny-coordinate         y: %8.2f +- %6.2f km     (lambda: %10.6f deg)",
 		   hy3->y[0], hy3->y[1], hy3->lon);
-   printf ("\ndepth                z:  %5.2f +-%5.2f", hy3->z[0], hy3->z[1]);
-   printf ("\nmagnitude           ml:  %5.2f +-%5.2f", hy3->ml[0], hy3->ml[1]);
-   printf ("\nrms of time residuals :  %6.3f", hy3->rms);
-   printf ("\nangular gap           : %6.1f", hy3->gap);
-   printf ("\ninfo                  :  %d", hy3->info);
-   printf ("\nerror ellipse axis l1 : %6.3f", hy3->eel1);
-   printf ("\n              axis l2 : %6.3f", hy3->eel2);
-   printf ("\n              theta   : %6.1f deg (to grid)", hy3->theta);
-   printf ("       (azimuth: %6.1f deg)", hy3->azim);
-   printf("\n"); 
+   fprintf(fout, "\ndepth                z:  %5.2f +-%5.2f km", hy3->z[0], hy3->z[1]);
+   fprintf(fout, "\nmagnitude           ml:  %5.2f +-%5.2f", hy3->ml[0], hy3->ml[1]);
+   fprintf(fout, "\nrms of time residuals :  %5.2f s", hy3->rms);
+   fprintf(fout, "\nangular gap           : %6.1f deg", hy3->gap);
+   fprintf(fout, "\ninfo                  :  %d", hy3->info);
+   fprintf(fout, "\nerror ellipse axis l1 : %5.2f km", hy3->eel1);
+   fprintf(fout, "\n              axis l2 : %5.2f km", hy3->eel2);
+   fprintf(fout, "\n              theta   : %6.1f deg (to grid)", hy3->theta);
+   fprintf(fout, "       (azimuth: %6.1f deg)", hy3->azim);
+   fprintf(fout, "\n"); 
 }
 
 

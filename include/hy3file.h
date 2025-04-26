@@ -74,7 +74,8 @@ struct hy3_file
 }; // end of struct hy3_file
 
 
-void hy3print(struct hy3_file * hy3);
+//void hy3print(struct hy3_file * hy3);
+void hy3save(struct hy3_file *hy3, FILE *fout);
 int hy3load (struct hy3_file *hy3, FILE *fin);
 
 #ifdef __cplusplus

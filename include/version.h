@@ -1,13 +1,15 @@
 #ifndef VERSION_H
 #define VERSION_H
 
+#define VERS "v0.10.3"
+
 // Version information header file
 #ifdef __cplusplus
 #include <iostream>
 #include <string>
 
 std::string getVersion() {
-    return "v0.5.0";
+    return (VERS);
 }
 std::string getBuildDate() {
     return __DATE__;
@@ -36,7 +38,7 @@ std::string getBuildInfoWithCommitAndBranch() {
 //#include <stdlib.h>
 //#include <time.h>
 char* getVersion() {
-    return "v0.5.0";
+    return (VERS);
 }
 char* getBuildDate() {
     return __DATE__;

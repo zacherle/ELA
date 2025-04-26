@@ -114,7 +114,7 @@ void CArrivalFile::fill(const std::vector<TRecordHyp> &hyp, const std::map<std::
 	a.phase = r.phase;
 	a.trec = 0.0; // initialize to zero
 	a.wt = 0.0; // initialize to zero
-	a.amp = r.amp_d;
+	a.amp = r.amp_v;
 
         // convert r.year from YY format to YYYY format
 	// r.year is in YY format

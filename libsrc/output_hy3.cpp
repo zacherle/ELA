@@ -19,6 +19,53 @@
 #include "calc_covar.h"
 #include "param.h"
 
+
+
+// Subroutine get_errellipse
+// Computes the error ellipse parameters from a 4x4 covariance matrix 'co' stored in column‐major order.
+// Output parameters:
+//   dxer, dyer : The square roots of the absolute values of co(1,1) and co(2,2).
+//   dzer, dter : The square roots of the absolute values of co(3,3) and co(4,4).
+//   l1, l2     : The lengths of the major and minor axes of the error ellipse.
+//   theta      : The orientation angle of the error ellipse (in degrees).
+//void get_errellipse(const double co[][4],
+void get_errellipse(const double * aco,
+       	float &dxer, float &dyer, float &dzer, float &dter,
+	float &l1, float &l2, float &theta)
+{
+    // Convert the 1D array to a 2D array for easier access.
+    // The array is assumed to be in column-major order.
+    // This is a pointer to an array of 4 arrays of 4 doubles.
+    // Pointer aco is actually pointing to a 4x4 matrix.
+    double (*co)[4] = (double(*)[4]) aco;
+    // Compute the determinant from the 2x2 upper-left block of co.
+    double deter = co[0][0]*co[1][1] - co[0][1]*co[1][0];
+    double d11 = co[1][1]/deter;
+    double d22 = co[0][0]/deter;
+    double d21 = -co[1][0]/deter;
+    theta = std::atan(2 * d21 / (d11 - d22)) / 2.0;
+    double cos_theta = std::cos(theta);
+    double sin_theta = std::sin(theta);
+    double al = d11*cos_theta*cos_theta + 2*d21*cos_theta*sin_theta + d22*sin_theta*sin_theta;
+    double bl = d11*sin_theta*sin_theta - 2*d21*cos_theta*sin_theta + d22*cos_theta*cos_theta;
+    l1 = std::sqrt(1.0 / al);
+    l2 = std::sqrt(1.0 / bl);
+    // Convert theta to degrees.
+    theta = theta * RAD2DEG;
+    // Adjust if l2 is greater than l1.
+    if (l2 > l1) {
+        double tl = l1;
+        l1 = l2;
+        l2 = tl;
+        theta = theta + 90.0;
+    }
+    dxer = std::sqrt(std::fabs(co[0][0]));
+    dyer = std::sqrt(std::fabs(co[1][1]));
+    dzer = std::sqrt(std::fabs(co[2][2]));
+    dter = std::sqrt(std::fabs(co[3][3]));
+}
+
+
 double mconvergence(double X, double Y)
 {
 	// Calculate meridian convergence
@@ -98,25 +145,26 @@ void output_hy3(struct hy3_file &hy3, TParams &param, const double hypo[4],
         TRecordHyp r;
 	a = arrs.arr[i];
 	//r = hyp.rec(a.id);
+	r = hyp[i];
 	
 	double dx = a.X - hypo[0];
 	double dy = a.Y - hypo[1];
 	double dz = a.Z - hypo[2];
-	// calculate azimuth
+	// calculate azimuth from the epicenter to the station
 	double aaz = std::atan2(dy, dx) * RAD2DEG;
-   	aaz = std::fmod(720.0 + aaz - 180.0 - meridian_con, 360.0);
+   	aaz = std::fmod(720.0 + aaz - meridian_con, 360.0);
 	if(aaz < 0) aaz += 360.0;
         if(a.wt > 0.0) {
 	    az[j_az++] = static_cast<float>(aaz);
 	}
 
 	// calculate distance
-	double dhypo = std::sqrt(dx * dx + dy * dy + dz * dz);
-	double depi = std::sqrt(dx * dx + dy * dy);
+	double dhypo = std::sqrt(dx*dx + dy*dy + dz*dz);
+	double depi = std::sqrt(dx*dx + dy*dy);
        
         // station magnitude	
 	double amag = localmagnitude(hypo, a);
-        if (amag > -9.9) {
+        if (amag > -9.0) {
             nmag = nmag + 1;
             smag += amag;
             smag2 += amag * amag;
@@ -135,7 +183,7 @@ void output_hy3(struct hy3_file &hy3, TParams &param, const double hypo[4],
 	hy3.rec[i].res = ares;
 	hy3.rec[i].amp = a.amp;
 	hy3.rec[i].freq = a.freq;
-	hy3.rec[i].w = a.wt;
+	hy3.rec[i].w = r.wt;
 	hy3.rec[i].epi = static_cast<float>(depi);
 	hy3.rec[i].hypo = static_cast<float>(dhypo);
 	hy3.rec[i].azm = static_cast<float>(aaz);
@@ -168,7 +216,8 @@ void output_hy3(struct hy3_file &hy3, TParams &param, const double hypo[4],
 
     // error ellipse
     float dxer, dyer, dzer, dter, l1, l2, theta;
-    get_errellipse(co, &dxer, &dyer, &dzer, &dter, &l1, &l2, &theta);
+    // get_errellipse((double(*)[4]) co, dxer, dyer, dzer, dter, l1, l2, theta);
+    get_errellipse(co, dxer, dyer, dzer, dter, l1, l2, theta);
     hy3.x[0] = hypo[0];
     hy3.x[1] = dxer;
     hy3.y[0] = hypo[1];

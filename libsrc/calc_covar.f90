@@ -161,57 +161,6 @@ end if
    varD=varD+model_error**2
 
 cov=covM*varD
-
 end subroutine cov_matrix2
-
-
-subroutine get_errellipse(co,dxer,dyer,dzer, dter,l1,l2,theta) BIND(C,name='get_errellipse')
-! Computes the error ellipse parameters from a 4x4 covariance matrix 'co' stored in column‐major order.
-! Output parameters:
-! dxer, dyer : The square roots of the absolute values of co(1,1) and co(2,2).
-! dzer, dter : The square roots of the absolute values of co(3,3) and co(4,4).
-! l1, l2     : The lengths of the major and minor axes of the error ellipse.
-! theta      : The orientation angle of the error ellipse (in degrees).
-
-real(real64), dimension(4,4),intent(IN) :: co
-real,intent(OUT) ::   dxer,dyer,dzer,dter
-real,intent(OUT) ::   theta
-real,intent(OUT) ::   l1,l2
-
-real(real64)    deter
-real(real64)    d11,d21,d22
-real(real64)    al,bl
-real(real64)    tl
-
-! error ellipse for epicenter
-   deter=co(1,1)*co(2,2)-co(1,2)*co(2,1)
-   d11=co(2,2)/deter
-   d22=co(1,1)/deter
-   d21=-co(2,1)/deter
-   theta=atan(2*d21/(d11-d22))/2
-   al=d11*cos(theta)**2 + 2*d21*cos(theta)*sin(theta) + d22*sin(theta)**2
-   bl=d11*sin(theta)**2 - 2*d21*cos(theta)*sin(theta) + d22*cos(theta)**2
-
-   l1=sqrt(1/al)
-   l2=sqrt(1/bl)
-
-! major axis of the error ellipse to the x-axis
-   theta = real(theta*RAD2DEG)
-
-! l1 is major axis
-   if (l2 .gt. l1 ) then
-      tl=l1
-      l1=l2
-      l2=tl
-      theta=theta+90.0
-   endif
-
-   dxer=sqrt(abs(co(1,1)))
-   dyer=sqrt(abs(co(2,2)))
-
-   dzer=sqrt(abs(co(3,3)))
-   dter=sqrt(abs(co(4,4)))
-
-end subroutine get_errellipse
 
 end module calc_covar
