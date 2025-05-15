@@ -32,7 +32,8 @@ SRC:= hypfile.cpp \
     output_hy3.cpp \
     twopoint.cpp \
     hy3file.c \
-    wgsjtsk.c
+    wgsjtsk.c \
+    version.c
 
 OBJ_2 = $(SRC:.c=.o)
 OBJ_1 = $(OBJ_2:.cpp=.o)

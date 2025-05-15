@@ -53,7 +53,6 @@ void loc_hypo_lm(std::array<double, 4>& hypo, int m, double* fvec,
     // tol = 1.0e-6; // 1.0e-6 is the default value in the original code 
     int fvec_size = m;
     int fjac_size = m;
-    std::cout << "start " << hypo[0] << " " << hypo[1] << " " << hypo[2] << " " << hypo[3] << std::endl;
     if (fix_depth) {
         int wa_size = 5*n+m;
         std::vector<double> wa;
@@ -66,12 +65,10 @@ void loc_hypo_lm(std::array<double, 4>& hypo, int m, double* fvec,
         std::vector<double> wa;
         wa.resize(wa_size);
         x = Xo(hypo.data(), 0.0); // relief = 0.0
-	std::cout << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
         lmder1_(tdxder, &m, &n, (double*) x.data(), fvec, fjac, &fjac_size, &tol,
                &info, ipvt, (double*) wa.data(), &wa_size);
         x = Xp(x.data(), 0.0);
     }
-std::cout << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
     hypo = x;
 }
 

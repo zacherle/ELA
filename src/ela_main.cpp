@@ -16,6 +16,7 @@ using std::exception;
 //using std::vector;
 using std::string;
 
+#include "version.h"
 #include "param.h"
 #include "stations.h"
 #include "layers.h"
@@ -40,6 +41,10 @@ string config_file;
 
 bool option_missing(false);
 
+// print version
+cout << "ELA " << getVersion() << endl;
+
+// parse command line options
 try {
 
     po::options_description desc("Usage: ela [options] input \n" \
@@ -90,10 +95,11 @@ try {
       }
 
     if (vm.count("version")) {
-        cout << "ELA v00.1 2024-05" << "\n";
+        cout << "ELA " << getVersion() << " | Date: " << getBuildDate() << " | Time: " << getBuildTime() << endl;
         return 0;
       }
 
+    // read config file
     std::ifstream ifs(config_file.c_str());
     if (!ifs) {
         cout << "can not open config file: " << config_file << "\n";
@@ -104,6 +110,7 @@ try {
 	po::notify(vm);
       }
 
+    // input hyp file
     if (vm.count("input")) {
 	file_i = vm["input"].as<string>();
         cout << "Input file: " << file_i << "\n";
@@ -113,6 +120,7 @@ try {
 	option_missing=true;
         }
 
+    // output hy3 file
     if (vm.count("output")) {
         file_o = vm["output"].as<string>();
         cout << "Output file: " << file_o << "\n";
@@ -128,6 +136,7 @@ try {
 	option_missing=true;
         }
 
+    // velocity model file
     if (vm.count("model")) {
 	file_m = vm["model"].as<string>();
         cout << "Velocity model file: " << file_m << "\n";
@@ -137,6 +146,7 @@ try {
 	option_missing=true;
         }
 
+    // stations list file
     if (vm.count("stations")) {
         file_s = vm["stations"].as<string>();
         cout << "Stations list file: " << file_s << "\n";
@@ -170,6 +180,7 @@ try {
     if (option_missing) {return 1;}
 
 struct TParams param;
+
 param.reading_err=reading_err;
 param.model_err=model_err;
 param.name_model=file_m.substr(file_m.find_last_of("/")+1,file_m.npos);
@@ -215,10 +226,6 @@ do {
     }
 } while (true);
 	
-    std::cout << startpt[0] << " " << startpt[1] << " " 
-              << startpt[2] << " " << startpt[3] << " " << init_nea << "\n";
-
-
     bool fix_x = false;
     bool fix_y = false;
     bool fix_depth = false;
@@ -256,8 +263,6 @@ do {
     }
 } while (true);
 
-    std::cout << fix_x << " " << fix_y << " " << fix_depth << "\n";
-
 param.fix = {fix_x, fix_y, fix_depth, false};
 param.init_nea = init_nea;   
 param.startpt = startpt;
@@ -293,15 +298,15 @@ std::cout << " Init NEA: " << param.init_nea << "\n";
 
     // read stations and fill 'stations' - map of TStation
     loadStations(file_s);
-    printStations();
+    // printStations();
 
     // read model and fill 'p_layers_map' - map of TLayers
     loadLayersPointerMap(file_m);
-    printLayersPointerMap();
+    // printLayersPointerMap();
 
     // read hyp file and fill 'hyp' - vector of TRecordHyp
     loadHyp(file_i);
-    printHyp();
+    // printHyp();
 
     // fill 'arrs' - vector of TArrival
     arrs.fill(hyp, stations);
@@ -310,8 +315,6 @@ std::cout << " Init NEA: " << param.init_nea << "\n";
     static double covM[4][4] = {0.0};
     // locate the hypocenter hypo and covariance matrix covM
     int info = get_hypo(arrs, param, hypo, covM);
-    //std::cout << "     FINAL L2 NORM OF THE RESIDUALS"
-    //     << std::setw(15) << std::fixed << std::setprecision(7) << enorm(marr, fvec) << std::endl;
     std::cout << "     EXIT PARAMETER" << std::setw(16) << "" << std::setw(10) << info << std::endl;
     std::cout << "     FINAL APPROXIMATE SOLUTION";
     for (size_t i = 0; i < hypo.size(); i++) {

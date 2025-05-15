@@ -15,7 +15,6 @@
     // transform from bounded parameter space Xp to optimization procedure space Xo
     std::array<double,4> Xo(const double* x, double zmin) {
         double o;
-    std::cout << "Xo: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
         // reflective transformation zp -> zo
         o = std::sqrt(std::pow((x[2] - zmin + 1.0), 2.0) - 1.0);
         return { x[0] - 1100.0, x[1] - 700.0, o, x[3] };
@@ -24,7 +23,6 @@
     // transform from optimization procedure space Xo to bounded parameter space Xp
     std::array<double,4> Xp(const double* x, double zmin) {
         double p;
-    std::cout << "Xp: " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
         // reflective transformation zo -> zp
         p = x[2];
         p = zmin - 1.0 + std::sqrt(p * p + 1.0);

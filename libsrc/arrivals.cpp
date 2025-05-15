@@ -206,16 +206,3 @@ void CArrivalFile::fill(const std::vector<TRecordHyp> &hyp, const std::map<std::
     // std::cout << "maxwt = " << maxwt << std::endl;
 }
 
-/*    
-    // Demonstrate toDateTime conversion for a sample rtime (e.g., 1.234 seconds)
-    int year, month, day, hour, minute, isec, msec;
-    arrs.toDateTime(1.234, year, month, day, hour, minute, isec, msec);
-    
-    // Output the computed weight sums
-    std::cout << "n_arr = " << arrs.n_arr << std::endl;
-    std::cout << "sumwt = " << arrs.sumwt << std::endl;
-    std::cout << "sumwt2 = " << arrs.sumwt2 << std::endl;
-    std::cout << "maxwt = " << arrs.maxwt << std::endl;
-    
-    return 0;
-*/

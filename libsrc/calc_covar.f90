@@ -11,7 +11,7 @@ double precision, parameter :: RAD2DEG=57.295779513082320876
 
 contains
 
-subroutine eigv_sym4(a,w)
+integer function eigv_sym4(a,w)
 ! Computes the eigenvalues and eigenvectors of a 4x4 symmetric matrix using LAPACK's dsyev.
 ! The matrix 'a' (dimension 4x4) is stored in column‐major order.
 ! On exit, if successful, a contains the orthonormal eigenvectors and w holds the eigenvalues.
@@ -88,10 +88,11 @@ real(real64), dimension(lwmax) :: work
       call dsyev( 'Vectors', 'Lower', n, a, lda, w, work, lwork, info )
       if( info.gt.0 ) then
          write(*,*)'The algorithm failed to compute eigenvalues.'
-         stop
+!         stop
       end if
+      eigv_sym4=info
 
-end subroutine eigv_sym4
+end function eigv_sym4
 
 subroutine cov_matrix2(cov,m,n,resw,Gw,w,reading_error,model_error) bind(C,name='cov_matrix2')
 !covariance matrix
@@ -110,6 +111,7 @@ real(real64)               :: varD
 integer                    :: marrv
 real(real64)               :: sumw
 integer :: j
+integer :: info
 
 !GG=G*G'
 GG=MATMUL(TRANSPOSE(Gw),Gw)
@@ -117,7 +119,7 @@ GG=MATMUL(TRANSPOSE(Gw),Gw)
 !eigenvalues (ortogonal) decomposition
 !V*diag(l)*V'=GG
 eigV=GG
-call eigv_sym4(eigV,eig_l)
+info = eigv_sym4(eigV,eig_l)
 !test
 !   eigL=0.0
 !   do i=1,4

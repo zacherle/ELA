@@ -66,8 +66,6 @@ real, dimension(2*nl) :: ray_z
    real, dimension(nl)   :: vsq
    integer i
 
-   write(*,*) s_x,s_z,nl
-
    type_of_wave=0
 
    do i=1,nl-1

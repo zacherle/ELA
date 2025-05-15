@@ -1,3 +1,8 @@
+2025-05-15 v0.10.4
+Reduce debug output.
+Add version.c
+
+
 2025-04-26 v0.10.3
 hy3file.c: hy3save
 Edit text format for output file hy3.

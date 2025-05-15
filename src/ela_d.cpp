@@ -95,7 +95,6 @@ int get_hypo(const CArrivalFile & arrs, const TParams &param,
         int n0 = 0; 
         double t0 = 1e20;
         for (int i = 0; i < marr; i++) {
-		std::cout << i << arrs.arr[i].phase << arrs.arr[i].trec << std::endl;
             if (arrs.arr[i].phase.empty()) continue; 
             if (arrs.arr[i].trec > t0) continue; 
             t0 = arrs.arr[i].trec;
@@ -115,12 +114,6 @@ int get_hypo(const CArrivalFile & arrs, const TParams &param,
 
     std::cout << "     FINAL L2 NORM OF THE RESIDUALS"
          << std::setw(15) << std::fixed << std::setprecision(7) << enorm(marr, fvec) << std::endl;
-    std::cout << "     EXIT PARAMETER" << std::setw(16) << "" << std::setw(10) << info << std::endl;
-    std::cout << "     FINAL APPROXIMATE SOLUTION";
-    for (size_t i = 0; i < hypo.size(); i++) {
-	    std::cout << std::setw(15) << std::fixed << std::setprecision(7) << hypo[i];
-    }
-    std::cout << std::endl;
 
     // covariance
     gather.get_res_w(hypo.data(), marr, fvec, w);
@@ -134,6 +127,8 @@ int get_hypo(const CArrivalFile & arrs, const TParams &param,
         }
     }
     cov_matrix2(&(covM[0][0]), marr, 4, fvec, &(fjac[0][0]), w, param.reading_err, param.model_err);
+    // print covariance matrix
+    /*
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             std::cout << std::fixed << std::setw(16) << std::setprecision(6) 
@@ -141,6 +136,7 @@ int get_hypo(const CArrivalFile & arrs, const TParams &param,
         }
         std::cout << "\n";
     }
+    */
     // free memory
     delete[] fvec; 
     delete[] w;

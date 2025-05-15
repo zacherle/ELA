@@ -67,7 +67,7 @@ void hy3save(struct hy3_file * hy3, FILE *fout) {
    fprintf(fout, "\n--------------- ");
    time_t origin_et = timelocal(&hy3->ref_time)+ (int) hy3->origin_time[0];
    tm = localtime(&origin_et);
-   fprintf(fout, "\norigin time          t:  %02d-%02d-%02d %02d:%02d:%06.3f +-% 7.3f",
+   fprintf(fout, "\norigin time          t:  %02d-%02d-%02d %02d:%02d:%06.3f +-% 7.3f s",
 		   tm->tm_year%100, tm->tm_mon+1, tm->tm_mday,
 		   tm->tm_hour, tm->tm_min, hy3->origin_time[0], hy3->origin_time[1]);
    fprintf(fout, "\nx-coordinate         x: %8.2f +- %6.2f km     (fi:     %10.6f deg)",
@@ -467,35 +467,3 @@ int hy3load (struct hy3_file *hy3, FILE *fin) {
 
   return (0);
 }
-
-// Program to test the reading of the hypo3d file
-/*
-int main (int argc, char *argv[]) {
-
-  #define MAXREC 180
-  FILE *fin;
-  struct hy3_file hy3;
-
-  if (argc < 2)
-    {
-      fprintf (stderr, "Usage: %s <hypo3d file>\n", argv[0]);
-      exit (1);
-    }
-
-  fin = fopen (argv[1], "r");
-  if (fin == NULL)
-    {
-      fprintf (stderr, "Error opening file %s\n", argv[1]);
-      exit (1);
-    }
-  int nrec = MAXREC;
-  hy3.rec = (struct hy3_record *) malloc (nrec * sizeof(struct hy3_record));
-
-  hy3load (&hy3, fin);
-  fclose (fin);
-
-  hy3print (&hy3);
-
-  return (0);
-}
-*/

@@ -26,7 +26,7 @@ clean:
 	rm *.o $(APPS)
 
 $(BIN_DIR)/ela: ela_main.o ela_d.o loc_hypo.o $(LIB)
-	$(CC)  $(LDFLAGS) $^ -o $@ -lboost_program_options  -lgfortran -Wl,-Bstatic -lminpack -Wl,-Bdynamic $(LIBS)
+	$(CC)  $(LDFLAGS) $^ -o $@ -Wl,-Bstatic -lboost_program_options -lminpack -Wl,-Bdynamic -lgfortran $(LIBS)
 
 #lmder2.o: lmder2.for
 #	$(FC) $(FFLAGS) -c $<
